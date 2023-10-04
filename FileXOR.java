@@ -17,7 +17,10 @@ public class FileXOR {
 
             int bytesRead;
             int keyIndex = 0;
-            byte[] buffer = new byte[1024];
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+            long fileSize = inputStream.getChannel().size();
+            long bytesProcessed = 0;
 
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 for (int i = 0; i < bytesRead; i++) {
@@ -25,12 +28,16 @@ public class FileXOR {
                     keyIndex = (keyIndex + 1) % key.length();
                 }
                 outputStream.write(buffer, 0, bytesRead);
+
+                bytesProcessed += bytesRead;
+                long percentage = (bytesProcessed * 100) / fileSize;
+                System.out.print("\rXORing " + percentage + "%");
             }
 
             inputStream.close();
             outputStream.close();
 
-            System.out.println("File XOR encryption completed.");
+            System.out.println("\nFile " + inputFile + " XOR encryption completed as " + outputFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
